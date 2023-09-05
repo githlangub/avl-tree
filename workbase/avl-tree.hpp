@@ -1,47 +1,119 @@
 #ifndef __AVL_TREE_HPP__
 #define __AVL_TREE_HPP__
 
+#include "type.hpp"	/* UInt8, Int8 */
+
+#include <stack>	/* std::stack */
+#include <functional>	/* std::function */
+#include <optional>	/* std::optional */
+
 
 class AvlTree
 {
 public:
+	typedef int KeyType;
+	typedef int ValueType;
+
+	struct Entry
+	{
+		KeyType key;
+		ValueType value;
+
+		Entry(KeyType const& = KeyType(), ValueType const& = ValueType());
+		Entry& operator=(Entry const&);
+	};
+
 	struct Node
 	{
+		Entry entry;
+
+		UInt8 height;
 		Node* pLeft;
 		Node* pRight;
 
-		unsigned char BalanceFactor;
-
-		int key;
-		int value;
-
-		Node(int, int, Node* = nullptr, Node* = nullptr);
+		Node(Entry const& = Entry(), UInt8 const& = 0, Node* const& = nullptr, Node* const& = nullptr);
 	};
 
 	typedef Node* NodePtr;
 
+	typedef std::stack<NodePtr*> RouteType;
+		
+	typedef std::function<bool(NodePtr)> CallbackType;
+
+	typedef std::optional<ValueType> NullableValueType;
+
 public:
 	AvlTree(void);
-	AvlTree(const AvlTree& );
-	AvlTree(AvlTree&& );
+	AvlTree(AvlTree const&);
+	AvlTree(AvlTree&&);
 	~AvlTree();
 
-	/*void Insert();
-	void Delete();
-	void Update();
-	void Retrieve();*/
+	void put(
+		KeyType const&,
+		NullableValueType const&
+	);
 
-private:
-	NodePtr copy(NodePtr );
+	NullableValueType get(
+		KeyType const&
+	);
 
-	int Set(int, int* );
-	int Get(int, int* ) const;
+protected:
+public:
+	void destroy(
+		NodePtr
+	);
 
-	int leftRotate(Node* , Node* );
-	int rightRotate(Node* ,Node* );
+	NodePtr copy(
+		NodePtr
+	) const;
 
-private:
-	Node* pRoot;
+	void insert(
+		KeyType const&,
+		ValueType const&,
+		RouteType&
+	);
+
+	void de1ete(
+		RouteType&
+	);
+
+	void update(
+		ValueType const&,
+		RouteType&
+	);
+
+	RouteType retrieve(
+		KeyType const&
+	);
+
+	bool traverse_1(
+		NodePtr,
+		CallbackType const&
+	);
+
+	void rebalance(
+		RouteType&
+	);
+
+	NodePtr leftRotate(
+		NodePtr
+	);
+
+	NodePtr rightRotate(
+		NodePtr
+	);
+
+	UInt8 heightOfNode(
+		NodePtr
+	) const;
+
+	Int8 balanceFactorOfNode(
+		NodePtr
+	) const;
+
+protected:
+public:
+	NodePtr pRoot;
 };
 
 #endif
